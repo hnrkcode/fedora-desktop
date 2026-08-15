@@ -10,15 +10,3 @@
     src: gitconfig
     dest: "{{ ansible_user_dir }}/.gitconfig"
     mode: "0644"
-
-- name: Ensure ~/.config/git exists
-  ansible.builtin.file:
-    path: "{{ ansible_user_dir }}/.config/git"
-    state: directory
-    mode: "0755"
-
-- name: Deploy git identity includes
-  ansible.builtin.copy:
-    src: config/
-    dest: "{{ ansible_user_dir }}/.config/git/"
-    mode: "0644"
