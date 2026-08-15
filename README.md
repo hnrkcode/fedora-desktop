@@ -12,3 +12,7 @@ ansible-playbook site.yml --list-tasks
 ```bash
 ansible-playbook playbook.yml --check --diff
 ```
+
+```bash
+ansible-playbook playbook.yml
+```
