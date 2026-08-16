@@ -4,3 +4,4 @@
   # facts required: roles use ansible_user_dir
   roles:
     - git
+    - zsh
