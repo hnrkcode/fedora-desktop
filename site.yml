@@ -1,8 +1,8 @@
 ---
 - name: Configure Fedora desktop
   hosts: local
-  # facts required: roles use ansible_user_dir
+  # facts required: roles use ansible_facts['user_dir']
   roles:
     - git
     - zsh
-    - dev-tools
+    - uv

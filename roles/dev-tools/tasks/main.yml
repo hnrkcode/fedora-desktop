@@ -1,7 +1,0 @@
----
-- name: Install developer tools
-  become: true
-  ansible.builtin.dnf5:
-    name:
-      - uv
-    state: present

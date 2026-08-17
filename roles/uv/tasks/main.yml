@@ -1,0 +1,85 @@
+---
+- name: Resolve latest uv release
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/astral-sh/uv/releases/latest
+  register: uv_release
+  when: uv_version == "latest"
+  check_mode: false
+
+- name: Set target uv version
+  ansible.builtin.set_fact:
+    uv_target_version: >-
+      {{ uv_release.json.tag_name if uv_version == "latest" else uv_version }}
+
+- name: Check installed uv version
+  ansible.builtin.command: "{{ uv_install_dir }}/uv --version"
+  register: uv_installed
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Set installed uv version
+  ansible.builtin.set_fact:
+    uv_current_version: >-
+      {{ uv_installed.stdout.split()[1] if uv_installed.rc == 0 else "" }}
+
+- name: Install uv
+  when: uv_current_version != uv_target_version
+  block:
+    - name: Create temporary directory for the uv installer
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: uv
+      register: uv_tmp
+
+    - name: Download uv installer
+      ansible.builtin.get_url:
+        url: >-
+          {{ "https://astral.sh/uv/install.sh" if uv_version == "latest"
+             else "https://astral.sh/uv/" ~ uv_target_version ~ "/install.sh" }}
+        dest: "{{ uv_tmp.path }}/install.sh"
+        mode: "0755"
+
+    - name: Run uv installer
+      ansible.builtin.command: "{{ uv_tmp.path }}/install.sh"
+      environment:
+        UV_INSTALL_DIR: "{{ uv_install_dir }}"
+        UV_NO_MODIFY_PATH: "1"
+      changed_when: true
+  always:
+    - name: Remove temporary directory
+      ansible.builtin.file:
+        path: "{{ uv_tmp.path }}"
+        state: absent
+      when: uv_tmp.path is defined
+
+- name: Create zsh completions directory
+  ansible.builtin.file:
+    path: "{{ uv_completions_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Generate zsh completions
+  ansible.builtin.command: "{{ item.command }}"
+  register: uv_completions
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  loop:
+    - name: uv
+      command: "{{ uv_install_dir }}/uv generate-shell-completion zsh"
+    - name: uvx
+      command: "{{ uv_install_dir }}/uvx --generate-shell-completion zsh"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Deploy zsh completions
+  ansible.builtin.copy:
+    content: "{{ item.stdout }}"
+    dest: "{{ uv_completions_dir }}/_{{ item.item.name }}"
+    mode: "0644"
+  when: item.rc == 0
+  loop: "{{ uv_completions.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  diff: false
