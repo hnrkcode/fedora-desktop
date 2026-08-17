@@ -1,0 +1,41 @@
+---
+# Upgrades are handled by re-running the installer, fnm has no self-update.
+- name: Install fnm dependencies
+  become: true
+  ansible.builtin.dnf5:
+    name: unzip
+    state: present
+
+- name: Install fnm
+  ansible.builtin.shell:
+    cmd: >-
+      curl -fsSL https://fnm.vercel.app/install
+      | bash -s -- --install-dir "{{ fnm_install_dir }}" --skip-shell
+    creates: "{{ fnm_install_dir }}/fnm"
+
+- name: Deploy fnm shell integration
+  ansible.builtin.copy:
+    src: fnm.zsh
+    dest: "{{ fnm_zsh_custom_dir }}/fnm.zsh"
+    mode: "0644"
+
+- name: Create zsh completions directory
+  ansible.builtin.file:
+    path: "{{ fnm_completions_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Generate zsh completions
+  ansible.builtin.command: "{{ fnm_install_dir }}/fnm completions --shell zsh"
+  register: fnm_completions
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Deploy zsh completions
+  ansible.builtin.copy:
+    content: "{{ fnm_completions.stdout }}"
+    dest: "{{ fnm_completions_dir }}/_fnm"
+    mode: "0644"
+  when: fnm_completions.rc | default(1) == 0
+  diff: false
