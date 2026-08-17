@@ -1,0 +1,23 @@
+---
+- name: Import Mullvad GPG key
+  become: true
+  ansible.builtin.rpm_key:
+    key: https://repository.mullvad.net/rpm/mullvad-keyring.asc
+    state: present
+
+- name: Add Mullvad VPN repository
+  become: true
+  ansible.builtin.get_url:
+    url: https://repository.mullvad.net/rpm/stable/mullvad.repo
+    dest: /etc/yum.repos.d/mullvad.repo
+    owner: root
+    group: root
+    mode: "0644"
+  register: mullvad_repo
+
+- name: Install Mullvad VPN
+  become: true
+  ansible.builtin.dnf5:
+    name: mullvad-vpn
+    state: present
+    update_cache: "{{ mullvad_repo.changed }}"
