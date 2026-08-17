@@ -1,0 +1,31 @@
+---
+# OpenSnitch is not in the Fedora repos, so the latest upstream release RPMs
+# are installed directly. They are unsigned, hence the disabled GPG check.
+- name: Look up the latest OpenSnitch release
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/evilsocket/opensnitch/releases/latest
+  register: opensnitch_release
+  changed_when: false
+  check_mode: false
+
+- name: Install OpenSnitch
+  become: true
+  vars:
+    # Matches opensnitch-<version>.<arch>.rpm and opensnitch-ui-<version>.noarch.rpm
+    opensnitch_rpm_pattern: "/opensnitch(-ui)?-[0-9][^/]*\\.({{ ansible_facts['architecture'] }}|noarch)\\.rpm$"
+  ansible.builtin.dnf5:
+    name: >-
+      {{ opensnitch_release.json.assets
+      | map(attribute='browser_download_url')
+      | select('search', opensnitch_rpm_pattern) | list }}
+    state: present
+    disable_gpg_check: true
+
+# The UI autostarts via /etc/xdg/autostart/opensnitch_ui.desktop from the
+# package, only the daemon needs enabling.
+- name: Enable OpenSnitch daemon
+  become: true
+  ansible.builtin.systemd_service:
+    name: opensnitch.service
+    enabled: true
+    state: started
