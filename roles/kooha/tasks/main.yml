@@ -1,0 +1,8 @@
+---
+- name: Install Kooha
+  become: true
+  community.general.flatpak:
+    name: io.github.seadve.Kooha
+    remote: flathub
+    method: system
+    state: present

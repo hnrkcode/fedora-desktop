@@ -1,0 +1,8 @@
+---
+- name: Install Obsidian
+  become: true
+  community.general.flatpak:
+    name: md.obsidian.Obsidian
+    remote: flathub
+    method: system
+    state: present

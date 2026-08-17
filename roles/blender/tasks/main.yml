@@ -1,0 +1,10 @@
+---
+# Installed from the "fedora" remote that ships with Fedora, matching the
+# existing installation. Flathub also carries org.blender.Blender.
+- name: Install Blender
+  become: true
+  community.general.flatpak:
+    name: org.blender.Blender
+    remote: fedora
+    method: system
+    state: present
