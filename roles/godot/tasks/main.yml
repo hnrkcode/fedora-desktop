@@ -1,0 +1,6 @@
+---
+- name: Install Godot
+  become: true
+  ansible.builtin.dnf5:
+    name: godot
+    state: present
