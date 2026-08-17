@@ -27,15 +27,30 @@
     state: present
     update_cache: "{{ docker_repo.changed }}"
 
-- name: Enable Docker service
+# The default json-file driver never rotates, so container logs grow until the
+# disk fills. The local driver rotates and compresses out of the box.
+- name: Configure the Docker daemon
+  become: true
+  ansible.builtin.copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart Docker
+
+- name: Enable Docker services
   become: true
   ansible.builtin.systemd_service:
-    name: docker.service
+    name: "{{ item }}"
     enabled: true
     state: started
+  loop:
+    - docker.service
+    - containerd.service
 
 # Membership in the docker group grants root-equivalent access to the host,
-# but is what lets the docker CLI run without sudo.
+# but is what lets the docker CLI run without sudo. Takes effect on next login.
 - name: Add user to the docker group
   become: true
   ansible.builtin.user:
