@@ -1,0 +1,6 @@
+---
+- name: Install DB Browser for SQLite
+  become: true
+  ansible.builtin.dnf5:
+    name: sqlitebrowser
+    state: present
