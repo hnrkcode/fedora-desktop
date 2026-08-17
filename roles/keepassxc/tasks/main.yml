@@ -4,3 +4,15 @@
   ansible.builtin.dnf5:
     name: keepassxc
     state: present
+
+- name: Create autostart directory
+  ansible.builtin.file:
+    path: "{{ ansible_facts['user_dir'] }}/.config/autostart"
+    state: directory
+    mode: "0755"
+
+- name: Autostart KeePassXC
+  ansible.builtin.copy:
+    src: org.keepassxc.KeePassXC.desktop
+    dest: "{{ ansible_facts['user_dir'] }}/.config/autostart/org.keepassxc.KeePassXC.desktop"
+    mode: "0644"

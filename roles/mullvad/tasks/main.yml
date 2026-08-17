@@ -21,3 +21,18 @@
     name: mullvad-vpn
     state: present
     update_cache: "{{ mullvad_repo.changed }}"
+
+- name: Create autostart directory
+  ansible.builtin.file:
+    path: "{{ ansible_facts['user_dir'] }}/.config/autostart"
+    state: directory
+    mode: "0755"
+
+# Symlink to the packaged desktop file, which is what the GUI's
+# "Launch app on start-up" setting creates. Only autostarts the GUI,
+# mullvad-daemon.service is enabled by the package.
+- name: Autostart Mullvad VPN
+  ansible.builtin.file:
+    src: /usr/share/applications/mullvad-vpn.desktop
+    dest: "{{ ansible_facts['user_dir'] }}/.config/autostart/mullvad-vpn.desktop"
+    state: link
