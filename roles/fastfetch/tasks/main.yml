@@ -1,0 +1,6 @@
+---
+- name: Install Fastfetch
+  become: true
+  ansible.builtin.dnf5:
+    name: fastfetch
+    state: present
