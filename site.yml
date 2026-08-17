@@ -5,4 +5,5 @@
   roles:
     - git
     - zsh
+    - opentofu
     - uv

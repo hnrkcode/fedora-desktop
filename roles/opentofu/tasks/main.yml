@@ -1,0 +1,6 @@
+---
+- name: Install OpenTofu
+  become: true
+  ansible.builtin.dnf5:
+    name: opentofu
+    state: present
