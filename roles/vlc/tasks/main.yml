@@ -1,0 +1,6 @@
+---
+- name: Install VLC
+  become: true
+  ansible.builtin.dnf5:
+    name: vlc
+    state: present

@@ -1,0 +1,6 @@
+---
+- name: Install BleachBit
+  become: true
+  ansible.builtin.dnf5:
+    name: bleachbit
+    state: present

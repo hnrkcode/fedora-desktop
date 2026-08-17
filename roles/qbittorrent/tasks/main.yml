@@ -1,0 +1,6 @@
+---
+- name: Install qBittorrent
+  become: true
+  ansible.builtin.dnf5:
+    name: qbittorrent
+    state: present
