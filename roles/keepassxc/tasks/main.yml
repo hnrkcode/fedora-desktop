@@ -16,3 +16,34 @@
     src: org.keepassxc.KeePassXC.desktop
     dest: "{{ ansible_facts['user_dir'] }}/.config/autostart/org.keepassxc.KeePassXC.desktop"
     mode: "0644"
+
+- name: Create KeePassXC config directory
+  ansible.builtin.file:
+    path: "{{ ansible_facts['user_dir'] }}/.config/keepassxc"
+    state: directory
+    mode: "0755"
+
+- name: Configure KeePassXC GUI settings
+  community.general.ini_file:
+    path: "{{ ansible_facts['user_dir'] }}/.config/keepassxc/keepassxc.ini"
+    section: GUI
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+    mode: "0644"
+  loop:
+    - option: ApplicationTheme
+      value: dark
+    - option: HidePasswords
+      value: "true"
+    - option: MinimizeOnClose
+      value: "true"
+    - option: MinimizeOnStartup
+      value: "true"
+    - option: MinimizeToTray
+      value: "true"
+    - option: ShowTrayIcon
+      value: "true"
+    - option: TrayIconAppearance
+      value: monochrome-light
+  loop_control:
+    label: "{{ item.option }}"
