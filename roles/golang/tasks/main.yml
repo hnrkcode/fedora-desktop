@@ -1,0 +1,69 @@
+---
+# The Fedora "golang" package trails upstream, so Go is installed from the
+# official tarball into /usr/local as described at https://go.dev/doc/install.
+# Re-running the role upgrades to the current stable release.
+- name: Look up the latest Go release
+  ansible.builtin.uri:
+    url: https://go.dev/dl/?mode=json
+  register: golang_releases
+  changed_when: false
+  check_mode: false
+
+- name: Select the Go archive for this machine
+  ansible.builtin.set_fact:
+    golang_archive: >-
+      {{ golang_releases.json[0].files
+      | selectattr('kind', 'eq', 'archive')
+      | selectattr('os', 'eq', 'linux')
+      | selectattr('arch', 'eq', golang_arch_map[ansible_facts['architecture']])
+      | first }}
+
+- name: Check the installed Go version
+  ansible.builtin.command: /usr/local/go/bin/go env GOVERSION
+  register: golang_installed
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Determine whether Go needs installing
+  ansible.builtin.set_fact:
+    golang_outdated: "{{ golang_installed.stdout | trim != golang_archive.version }}"
+
+- name: Download Go
+  ansible.builtin.get_url:
+    url: "https://go.dev/dl/{{ golang_archive.filename }}"
+    dest: "/tmp/{{ golang_archive.filename }}"
+    checksum: "sha256:{{ golang_archive.sha256 }}"
+    mode: "0644"
+  when: golang_outdated
+
+# Upstream requires replacing the tree wholesale, extracting over an existing
+# /usr/local/go leaves stale files behind and produces a broken toolchain.
+- name: Remove the previous Go installation
+  become: true
+  ansible.builtin.file:
+    path: /usr/local/go
+    state: absent
+  when: golang_outdated
+
+- name: Extract Go
+  become: true
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ golang_archive.filename }}"
+    dest: /usr/local
+    owner: root
+    group: root
+  # Nothing is downloaded in check mode, so there is no archive to extract.
+  when: golang_outdated and not ansible_check_mode
+
+- name: Remove the downloaded archive
+  ansible.builtin.file:
+    path: "/tmp/{{ golang_archive.filename }}"
+    state: absent
+  when: golang_outdated
+
+- name: Deploy Go shell integration
+  ansible.builtin.copy:
+    src: golang.zsh
+    dest: "{{ golang_zsh_custom_dir }}/golang.zsh"
+    mode: "0644"

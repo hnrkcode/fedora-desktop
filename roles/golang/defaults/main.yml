@@ -1,0 +1,6 @@
+---
+golang_zsh_custom_dir: "{{ ansible_facts['user_dir'] }}/.oh-my-zsh/custom"
+# Maps Ansible's architecture fact onto the names go.dev builds under.
+golang_arch_map:
+  x86_64: amd64
+  aarch64: arm64
