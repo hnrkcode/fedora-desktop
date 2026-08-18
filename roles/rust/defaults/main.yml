@@ -1,0 +1,4 @@
+---
+rust_cargo_home: "{{ ansible_facts['user_dir'] }}/.cargo"
+rust_completions_dir: "{{ ansible_facts['user_dir'] }}/.oh-my-zsh/custom/completions"
+rust_zsh_custom_dir: "{{ ansible_facts['user_dir'] }}/.oh-my-zsh/custom"
