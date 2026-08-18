@@ -1,0 +1,6 @@
+---
+- name: Install Solaar
+  become: true
+  ansible.builtin.dnf5:
+    name: solaar
+    state: present
