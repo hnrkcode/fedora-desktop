@@ -1,0 +1,8 @@
+---
+- name: Install Android Studio
+  become: true
+  community.general.flatpak:
+    name: com.google.AndroidStudio
+    remote: flathub
+    method: system
+    state: present
