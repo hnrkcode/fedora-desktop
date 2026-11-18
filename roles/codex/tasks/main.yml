@@ -1,0 +1,12 @@
+---
+- name: Install Codex CLI
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      curl -fsSL https://chatgpt.com/codex/install.sh | sh
+    executable: /bin/bash
+    creates: "{{ ansible_facts['user_dir'] }}/.local/bin/codex"
+  environment:
+    CODEX_NON_INTERACTIVE: "1"
+    # The zsh role already includes ~/.local/bin on PATH.
+    PATH: "{{ ansible_facts['user_dir'] }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"
