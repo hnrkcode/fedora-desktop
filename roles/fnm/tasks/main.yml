@@ -8,9 +8,11 @@
 
 - name: Install fnm
   ansible.builtin.shell:
-    cmd: >-
-      curl -fsSL https://fnm.vercel.app/install
+    cmd: |
+      set -o pipefail
+      curl -fsSL https://fnm.vercel.app/install \
       | bash -s -- --install-dir "{{ fnm_install_dir }}" --skip-shell
+    executable: /bin/bash
     creates: "{{ fnm_install_dir }}/fnm"
 
 - name: Deploy fnm shell integration

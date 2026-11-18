@@ -2,7 +2,10 @@
 # Upgrades are handled by "uv self update", not by this role.
 - name: Install uv
   ansible.builtin.shell:
-    cmd: curl -LsSf https://astral.sh/uv/install.sh | sh
+    cmd: |
+      set -o pipefail
+      curl -fsSL https://astral.sh/uv/install.sh | sh
+    executable: /bin/bash
     creates: "{{ uv_install_dir }}/uv"
   environment:
     UV_INSTALL_DIR: "{{ uv_install_dir }}"
