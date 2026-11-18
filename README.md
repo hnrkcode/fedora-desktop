@@ -3,6 +3,7 @@
 ```bash
 sudo dnf upgrade --refresh -y
 sudo dnf install -y ansible
+ansible-galaxy collection install -r requirements.yml
 ```
 
 ```bash
