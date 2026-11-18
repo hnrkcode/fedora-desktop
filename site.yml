@@ -3,30 +3,41 @@
   hosts: local
   # facts required: roles use ansible_facts['user_dir']
   roles:
+    # Prerequisites (run before the roles below)
+    - flatpak
     - git
     - zsh
-    - opentofu
-    - uv
-    - fnm
+
+    # Development
     - codex
-    - gimp
-    - qbittorrent
-    - bleachbit
-    - vlc
-    - keepassxc
-    - sqlitebrowser
-    - fastfetch
+    - docker
+    - fnm
     - godot
+    - golang
+    - opentofu
+    - rust
+    - sqlitebrowser
+    - uv
     - vscode
+
+    # Internet and productivity
     - brave
-    - flatpak
-    - kooha
     - obsidian
-    - blender
+    - qbittorrent
     - telegram
+
+    # Graphics and media
+    - blender
+    - gimp
+    - kooha
+    - vlc
+
+    # Security and privacy
+    - keepassxc
     - mullvad
     - opensnitch
-    - docker
+
+    # System utilities
+    - bleachbit
+    - fastfetch
     - solaar
-    - golang
-    - rust
