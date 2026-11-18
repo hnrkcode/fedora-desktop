@@ -32,6 +32,8 @@
     src: zshrc
     dest: "{{ ansible_facts['user_dir'] }}/.zshrc"
     mode: "0644"
+    backup: true
+    validate: /bin/zsh -n %s
 
 - name: Set zsh as default shell
   become: true

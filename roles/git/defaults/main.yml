@@ -1,0 +1,4 @@
+---
+# Empty values leave the existing identity unchanged.
+git_user_name: ""
+git_user_email: ""
