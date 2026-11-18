@@ -1,0 +1,14 @@
+---
+- name: Install Wireshark
+  become: true
+  ansible.builtin.dnf5:
+    name: wireshark
+    state: present
+
+# Enables packet capture without sudo. Takes effect on next login.
+- name: Add user to the wireshark group
+  become: true
+  ansible.builtin.user:
+    name: "{{ ansible_facts['user_id'] }}"
+    groups: wireshark
+    append: true
